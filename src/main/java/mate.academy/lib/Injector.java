@@ -27,7 +27,7 @@ public class Injector {
         for (Field field : declaredFields) {
             if (field.isAnnotationPresent(Inject.class)) {
                 Object fieldInstance = getInstance(field.getType());
-                clazzImplementationInstance = createNewIntance(clazz);
+                clazzImplementationInstance = createNewInstance(clazz);
                 field.setAccessible(true);
                 try {
                     field.set(clazzImplementationInstance, fieldInstance);
@@ -38,12 +38,21 @@ public class Injector {
             }
         }
         if (clazzImplementationInstance == null) {
-            clazzImplementationInstance = createNewIntance(clazz);
+            clazzImplementationInstance = createNewInstance(clazz);
         }
         return clazzImplementationInstance;
     }
 
-    private static Object createNewIntance(Class<?> clazz) {
+    public static Object getInstance(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            return getInstance(clazz);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Can't find class: " + className, e);
+        }
+    }
+
+    private static Object createNewInstance(Class<?> clazz) {
         if (instances.containsKey(clazz)) {
             return instances.get(clazz);
         }
